@@ -4,4 +4,4 @@ project(storageproj)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_subdirectory(libstorage)
+add_subdirectory(libbpl_storage)
