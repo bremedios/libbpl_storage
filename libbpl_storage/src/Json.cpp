@@ -62,6 +62,22 @@ namespace bpl::storage {
         return true;
     } // Load (String)
 
+    bool Json::Load(const std::shared_ptr<rapidjson::Document>& value, const std::string& name, std::string& loadedValue) {
+        if (!value->GetObject().HasMember(name.c_str())) {
+            return false;
+        }
+
+        if (!value->GetObject()[name.c_str()].IsString()) {
+            ERROR_MSG("[std::string&]: Invalid type for " << name);
+
+            return false;
+        }
+
+        loadedValue = value->GetObject()[name.c_str()].GetString();
+
+        return true;
+    } // Load (String)
+
     bool Json::Load(const rapidjson::Value& value, const std::string& name, SDL_Color& color) {
         if (!value.GetObject().HasMember(name.c_str())) {
             return false;
@@ -142,6 +158,37 @@ namespace bpl::storage {
         return true;
     } // (SDL_Rect)
 
+
+    bool Json::Load(const std::shared_ptr<rapidjson::Document>& value, const std::string& name, std::map<std::string, int>& strIntMap) {
+        if (!value->GetObject().HasMember(name.c_str())) {
+            ERROR_MSG("'" << name << "' does not exist");
+
+            return false;
+        }
+
+        if (!(*value)[name.c_str()].IsObject()) {
+            ERROR_MSG("'" << name << "' is not an object");
+
+            return false;
+        }
+
+        for (rapidjson::Value::ConstMemberIterator it = (*value)[name.c_str()].GetObject().MemberBegin(); it != (*value)[name.c_str()].GetObject().MemberEnd(); ++it) {
+            if (!it->name.IsString()) {
+                ERROR_MSG("Entry name is not a string");
+                return false;
+            }
+
+            if (!it->value.IsInt()) {
+                ERROR_MSG("Entry value is not an integer");
+                return false;
+            }
+
+            strIntMap.emplace(it->name.GetString(), it->value.GetInt());
+        }
+
+        return true;
+    } // Load (std::map<string, int>)
+
     std::shared_ptr<rapidjson::Document> Json::Open(const std::string& filename) {
         auto jsonDoc = std::make_shared<rapidjson::Document>();
 
@@ -151,7 +198,7 @@ namespace bpl::storage {
         jsonDoc->ParseStream(isw);
 
         if (!jsonDoc->IsObject()) {
-            std::cerr << "Error opening file " << filename << std::endl;
+            ERROR_MSG("Error opening file " << filename);
 
             return std::make_shared<rapidjson::Document>(nullptr);
         }

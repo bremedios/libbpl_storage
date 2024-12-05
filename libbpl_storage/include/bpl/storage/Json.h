@@ -7,6 +7,7 @@
 
 #include <string>
 #include <memory>
+#include <map>
 #include <SDL2/SDL.h>
 
 #include "rapidjson/document.h"
@@ -19,9 +20,11 @@ namespace bpl::storage {
         static bool Load(const rapidjson::Value& value, const std::string& name, bool &loadedValue);
         static bool Load(const rapidjson::Value& value, const std::string& name, int &loadedValue);
         static bool Load(const rapidjson::Value& value, const std::string& name, std::string& loadedValue);
+        static bool Load(const std::shared_ptr<rapidjson::Document>& value, const std::string& name, std::string& loadedValue);
         static bool Load(const rapidjson::Value& value, const std::string& name, SDL_Color& color);
         static bool Load(const rapidjson::Value& value, const std::string& name, SDL_Rect& rect);
         static bool Load(const rapidjson::Value& value, const std::string& name, std::pair<int, int>& pairValue);
+        static bool Load(const std::shared_ptr<rapidjson::Document>& value, const std::string& name, std::map<std::string, int>& loadedValue);
 
         static std::shared_ptr<rapidjson::Document> Open(const std::string& name);
         static std::shared_ptr<rapidjson::Document> Open(const storage::Payload& payload);
